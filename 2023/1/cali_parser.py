@@ -1,12 +1,19 @@
-calibration_document='input.txt'
-def get_first_digit(line:str)->int:
-    for char in line:
-        if char.isnumeric(): return int(char)
-def get_last_digit(line:str)->int:
-    for char in reversed(line):
-        if char.isnumeric(): return int(char)
+calibration_document = 'input.txt'
 
-with open(calibration_document,'r') as docu:
+
+def get_first_digit(line: str) -> int:
+    for char in line:
+        if char.isnumeric():
+            return int(char)
+
+
+def get_last_digit(line: str) -> int:
+    for char in reversed(line):
+        if char.isnumeric():
+            return int(char)
+
+
+with open(calibration_document, 'r') as docu:
     lines = docu.readlines()
     calibration_numbers = []
     for line in lines:
