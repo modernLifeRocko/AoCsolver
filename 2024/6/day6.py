@@ -5,12 +5,36 @@ import numpy as np
 
 def main(file_name: str):
     layout, guard = get_input(file_name)
-    valid = layout[*guard.pos]
+    start = guard.pos
+    dir = guard.dir
+    valid = True
     while valid:
         guard.step_forward(layout)
         valid = guard.goes_out(layout)
     unique = np.unique(guard.route, axis=0)
     print("Part 1: ", len(unique))
+    loop_layouts = 0
+    for cell in unique:
+        new_layout = add_obst(layout, cell)
+        new_guard = Guard(start, dir)
+        valid = True
+        while valid:
+            new_guard.step_forward(new_layout)
+            dirs = new_guard.rout_dirs[:-1][
+                np.equal(new_guard.route[:-1], new_guard.pos).all(1)
+            ]
+            valid = new_guard.goes_out(new_layout)
+            if new_guard.dir in dirs.tolist():
+                print(cell)
+                loop_layouts += 1
+                valid = False
+    print("Part 2: ", loop_layouts)
+
+
+def add_obst(layout, cell):
+    new_layout = np.copy(layout)
+    new_layout[*cell] = '#'
+    return new_layout
 
 
 def get_input(file_name: str) -> np.array:
@@ -34,6 +58,7 @@ class Guard():
         self.pos = pos
         self.dir = dir
         self.route = np.array([pos])
+        self.rout_dirs = np.array([dir])
 
     dir_vect = {
         '^': np.array((-1, 0)),
@@ -47,6 +72,8 @@ class Guard():
         idx = dir_ord.index(self.dir)
         rot_idx = (idx + 1) % 4
         self.dir = dir_ord[rot_idx]
+        self.route = np.append(self.route, [self.pos], 0)
+        self.rout_dirs = np.append(self.rout_dirs, self.dir)
 
     def step_forward(self, layout):
         vect = self.dir_vect[self.dir]
@@ -54,8 +81,9 @@ class Guard():
         n, m = layout.shape
         if self.can_move(layout):
             self.route = np.append(self.route, [new_pos], 0)
+            self.rout_dirs = np.append(self.rout_dirs, self.dir)
             self.pos = new_pos
-        if layout[*new_pos] != '.':
+        elif layout[*new_pos] != '.':
             self.turn_right()
 
     def can_move(self, layout):
@@ -76,7 +104,6 @@ class Guard():
         in_range_x = new_pos[1] >= 0 and new_pos[1] < m
         in_range = in_range_x and in_range_y
         return in_range
-
 
 
 if __name__ == "__main__":
