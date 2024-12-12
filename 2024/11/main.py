@@ -16,6 +16,7 @@ def main(file_name: str):
         if _ == 24:
             print("Part 1: ", sum(stone_counts.values()))
     print("Part 2: ", sum(stone_counts.values()))
+    print(len([1 for stone in stone_counts if stone_counts[stone] != 0]))
 
 
 def get_input(file_name: str) -> np.array:
