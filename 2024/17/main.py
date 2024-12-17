@@ -21,6 +21,38 @@ def main(file_name):
         # print(opcode, operand)
         # input('enter continue')
         pointer, state = instructions[opcode](operand, state, pointer)
+    print('Part 2: ', solve(program))
+
+
+def solve(prog):
+    a = '0'
+    all_la = []
+    i = len(prog) - 1
+    while 0 <= i < len(prog):
+        pos_la = nbits(a, prog[i])
+        if pos_la:
+            all_la.append(pos_la)
+            i -= 1
+        else:
+            while len(all_la[-1]) == 0:
+                all_la = all_la[:-1]
+                i += 1
+                if len(all_la) == 0:
+                    return
+        a = all_la[-1][0]
+        all_la[-1] = all_la[-1][1:]
+    return int(a, 2)
+
+
+def nbits(a, goal):
+    pos_la = []
+    for i in range(8):
+        la = a + np.binary_repr(i).zfill(3)
+        na = int(la, 2)
+        out = ((i ^ 4) ^ (na >> (i ^ 1))) % 8
+        if out == goal:
+            pos_la.append(la)
+    return pos_la
 
 
 def get_input(file_name: str):
